@@ -32,3 +32,10 @@
         ;; This would override `fill-column' if it's an integer.
         (emacs-lisp-docstring-fill-column t))
     (fill-paragraph nil region)))
+
+;; https://github.com/emacs-lsp/lsp-mode/issues/2255#issuecomment-1786355147
+(defface lsp-flycheck-info-unnecessary
+    '((t))
+    "Face which apply to side line for symbols not used.
+Possibly erroneously redundant of lsp-flycheck-info-unnecessary-face."
+    :group 'lsp-ui-sideline)
