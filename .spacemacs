@@ -32,7 +32,18 @@ This function should only modify configuration layer settings."
 
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '(html
+      '(
+           (typescript :variables
+               typescript-fmt-tool 'prettier
+               typescript-fmt-on-save t
+               typescript-linter 'eslint
+               typescript-backend 'lsp
+               )
+           javascript
+           sql
+           html
+           ansible
+           csv
      yaml
      rust
      ;; ----------------------------------------------------------------
@@ -62,12 +73,16 @@ This function should only modify configuration layer settings."
      ;; (shell :variables
      ;;        shell-default-height 30
      ;;        shell-default-position 'bottom)
-     ; spell-checking
+     spell-checking
      ;; disable spell checking by default to prevent latex mode from hanging
-     (spell-checking :variables spell-checking-enable-by-default nil)
+     ;; This was due to the mingw version of aspell not able to find mode files.
+     ;; I changed to using the non-mingw64 version of aspell and both dicts and
+     ;; modes were then found.
+     ;(spell-checking :variables spell-checking-enable-by-default nil)
      syntax-checking
      ;; version-control
-     treemacs)
+     treemacs
+     zig)
 
 
    ;; List of additional packages that will be installed without being wrapped
@@ -78,7 +93,11 @@ This function should only modify configuration layer settings."
    ;; `dotspacemacs/user-config'. To use a local version of a package, use the
    ;; `:location' property: '(your-package :location "~/path/to/your-package/")
    ;; Also include the dependencies as they will not be resolved automatically.
-   dotspacemacs-additional-packages '()
+      dotspacemacs-additional-packages '((iec61131-mode
+                                             :location (recipe
+                                                           :fetcher github
+                                                           :repo "wadoon/st-mode"
+                                                           :files ("iec61131-mode.el"))))
 
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -572,7 +591,7 @@ configuration.
 It is mostly for variables that should be set before packages are loaded.
 If you are unsure, try setting them in `dotspacemacs/user-config' first."
   (setq-default dotspacemacs-themes '(zenburn spacemacs-dark))
-  (setq-default ispell-program-name "c:/msys64/mingw64/bin/aspell.exe")
+  (setq-default ispell-program-name "c:/msys64/usr/bin/aspell.exe")
   (set-language-environment "utf-8")
   (prefer-coding-system 'utf-8)
   (set-default-coding-systems 'utf-8)
@@ -634,19 +653,21 @@ This function is called at the very end of Spacemacs initialization."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(evil-want-Y-yank-to-eol nil)
+ '(org-adapt-indentation t)
  '(org-agenda-files '("c:/Users/jtebokkel/Dropbox/org"))
  '(org-capture-templates
-   '(("t" "TODO" entry
-      (file "c:/Users/jtebokkel/Dropbox/org/gtd.org")
-      "* TODO %? %^g")
-     ("p" "PowerCore" entry
-      (file+olp+datetree "c:/Users/jtebokkel/Dropbox/org/powercore.org")
-      "**** %<%H:%M>: %? %^g\12   %t")
-     ("j" "Journal" entry
-      (file+olp+datetree "c:/Users/jtebokkel/Dropbox/org/journal.org")
-      "**** %<%H:%M>: %? %^g\12   %t")))
+      '(("t" "TODO" entry
+            (file "c:/Users/jtebokkel/Dropbox/org/gtd.org")
+            "* TODO %? %^g")
+           ("p" "PowerCore" entry
+               (file+olp+datetree "c:/Users/jtebokkel/Dropbox/org/powercore.org")
+               "**** %<%H:%M>: %? %^g\12   %t")
+           ("j" "Journal" entry
+               (file+olp+datetree "c:/Users/jtebokkel/Dropbox/org/journal.org")
+               "**** %<%H:%M>: %? %^g\12   %t")))
  '(package-selected-packages
-   '(add-node-modules-path web-completion-data counsel-css emmet-mode helm-css-scss impatient-mode simple-httpd prettier-js pug-mode sass-mode haml-mode scss-mode slim-mode tagedit web-beautify web-mode yaml-mode counsel-gtags counsel swiper ron-mode rustic xterm-color rust-mode toml-mode yapfify stickyfunc-enhance sphinx-doc pytest pyenv-mode pydoc py-isort poetry pippel pipenv pyvenv pip-requirements nose lsp-python-ms lsp-pyright live-py-mode importmagic epc ctable concurrent helm-pydoc helm-gtags helm-cscope xcscope ggtags dap-mode bui cython-mode ivy company-anaconda blacken anaconda-mode pythonic helm-rtags google-c-style gendoxy flycheck-ycmd flycheck-rtags disaster cpp-auto-include company-ycmd ycmd request-deferred deferred company-rtags rtags company-c-headers ccls zenburn-theme yasnippet-snippets ws-butler writeroom-mode winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package unfill undo-tree treemacs-projectile treemacs-persp treemacs-magit treemacs-icons-dired toc-org symon symbol-overlay string-inflection string-edit spaceline-all-the-icons smeargle restart-emacs request rainbow-delimiters quickrun popwin pcre2el password-generator paradox overseer orgit-forge org-superstar org-rich-yank org-projectile org-present org-pomodoro org-mime org-download org-contrib org-cliplink open-junk-file nameless mwim multi-line mmm-mode markdown-toc macrostep lsp-ui lsp-treemacs lsp-origami lorem-ipsum link-hint inspector info+ indent-guide hybrid-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt helm-xref helm-themes helm-swoop helm-purpose helm-projectile helm-org-rifle helm-org helm-mode-manager helm-make helm-lsp helm-ls-git helm-git-grep helm-flx helm-descbinds helm-company helm-c-yasnippet helm-ag google-translate golden-ratio gnuplot gitignore-templates git-timemachine git-modes git-messenger git-link gh-md fuzzy font-lock+ flyspell-correct-helm flycheck-pos-tip flycheck-package flycheck-elsa flx-ido fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-terminal-cursor-changer evil-surround evil-org evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-collection evil-cleverparens evil-args evil-anzu eval-sexp-fu emr elisp-slime-nav elisp-def editorconfig dumb-jump drag-stuff dotenv-mode dired-quick-sort diminish devdocs define-word column-enforce-mode clean-aindent-mode centered-cursor-mode auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile aggressive-indent ace-link ace-jump-helm-line ac-ispell)))
+      '(iec61131-mode st-mode typescript-mode csv-mode ansible ansible-doc company-ansible jinja2-mode import-js grizzl js-doc js2-refactor multiple-cursors livid-mode nodejs-repl npm-mode skewer-mode js2-mode tern sql-indent sqlup-mode add-node-modules-path web-completion-data counsel-css emmet-mode helm-css-scss impatient-mode simple-httpd prettier-js pug-mode sass-mode haml-mode scss-mode slim-mode tagedit web-beautify web-mode yaml-mode counsel-gtags counsel swiper ron-mode rustic xterm-color rust-mode toml-mode yapfify stickyfunc-enhance sphinx-doc pytest pyenv-mode pydoc py-isort poetry pippel pipenv pyvenv pip-requirements nose lsp-python-ms lsp-pyright live-py-mode importmagic epc ctable concurrent helm-pydoc helm-gtags helm-cscope xcscope ggtags dap-mode bui cython-mode ivy company-anaconda blacken anaconda-mode pythonic helm-rtags google-c-style gendoxy flycheck-ycmd flycheck-rtags disaster cpp-auto-include company-ycmd ycmd request-deferred deferred company-rtags rtags company-c-headers ccls zenburn-theme yasnippet-snippets ws-butler writeroom-mode winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package unfill undo-tree treemacs-projectile treemacs-persp treemacs-magit treemacs-icons-dired toc-org symon symbol-overlay string-inflection string-edit spaceline-all-the-icons smeargle restart-emacs request rainbow-delimiters quickrun popwin pcre2el password-generator paradox overseer orgit-forge org-superstar org-rich-yank org-projectile org-present org-pomodoro org-mime org-download org-contrib org-cliplink open-junk-file nameless mwim multi-line mmm-mode markdown-toc macrostep lsp-ui lsp-treemacs lsp-origami lorem-ipsum link-hint inspector info+ indent-guide hybrid-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt helm-xref helm-themes helm-swoop helm-purpose helm-projectile helm-org-rifle helm-org helm-mode-manager helm-make helm-lsp helm-ls-git helm-git-grep helm-flx helm-descbinds helm-company helm-c-yasnippet helm-ag google-translate golden-ratio gnuplot gitignore-templates git-timemachine git-modes git-messenger git-link gh-md fuzzy font-lock+ flyspell-correct-helm flycheck-pos-tip flycheck-package flycheck-elsa flx-ido fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-terminal-cursor-changer evil-surround evil-org evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-collection evil-cleverparens evil-args evil-anzu eval-sexp-fu emr elisp-slime-nav elisp-def editorconfig dumb-jump drag-stuff dotenv-mode dired-quick-sort diminish devdocs define-word column-enforce-mode clean-aindent-mode centered-cursor-mode auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile aggressive-indent ace-link ace-jump-helm-line ac-ispell))
+ '(scroll-margin 5))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
